@@ -1,0 +1,43 @@
+[package]
+name = "inexor-rgf-plugin-asset"
+description = "Inexor - Reactive Graph Flow - Plugin - Asset"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "../../../../README.md"
+
+[package.metadata.deb]
+name = "libinexor-rgf-plugin-asset"
+depends = "inexor-rgf"
+assets = [
+    ["target/release/libinexor_rgf_plugin_asset.so", "usr/share/inexor-rgf/default/plugins/installed/libinexor_rgf_plugin_asset.so", "755"],
+]
+
+[dependencies]
+async-trait = { workspace = true }
+dashmap = { workspace = true }
+log = { workspace = true, features = ["std", "serde"] }
+log4rs = { workspace = true, features = ["console_appender", "file_appender", "toml_format"]}
+rust-embed = { workspace = true, features = ["debug-embed", "compression"] }
+springtime-di = { workspace = true, default-features = false, features = [ "threadsafe", "derive" ] }
+uuid = { workspace = true, features = ["serde", "v4"] }
+
+inexor-rgf-plugin-api = { workspace = true }
+inexor-rgf-type-system-api = { workspace = true }
+inexor-rgf-graph = { workspace = true }
+
+[dev-dependencies]
+inexor-rgf-model-asset = { version = "0.10.0", path = "../../crates/model" }
+
+[lib]
+# Plugins use crate-type cdylib
+# https://doc.rust-lang.org/reference/linkage.html
+# https://users.rust-lang.org/t/what-is-the-difference-between-dylib-and-cdylib/28847/3
+crate-type = ["cdylib"]
+
+[package.metadata.cargo-post.dependencies]
+toml = "0.8"
+serde = { version = "1.0", features = [ "derive" ] }
+glob = "0.3"

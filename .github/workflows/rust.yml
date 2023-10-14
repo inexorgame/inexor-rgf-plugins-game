@@ -1,0 +1,49 @@
+name: Rust
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "plugins/*/crates/**/*.rs"
+      - "plugins/**/crates/**/Cargo.toml"
+      - "Cargo.toml"
+      - ".github/workflows/rust.yml"
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "plugins/*/crates/**/*.rs"
+      - "plugins/**/crates/**/Cargo.toml"
+      - "Cargo.toml"
+      - ".github/workflows/rust.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: VCS Checkout
+        uses: actions/checkout@v3
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.3
+      - name: Build (Release Mode)
+        uses: actions-rs/cargo@v1
+        with:
+          command: "build"
+          args: "--release --verbose"
+      - name: Test (Release Mode)
+        uses: actions-rs/cargo@v1
+        with:
+          command: "test"
+          args: "--release --verbose"
